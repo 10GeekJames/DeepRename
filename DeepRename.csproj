@@ -11,4 +11,7 @@
     <EmbeddedResource Remove="deeprename\**" />
     <None Remove="deeprename\**" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="EPPlus" Version="5.7.0" />
+  </ItemGroup>
 </Project>

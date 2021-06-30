@@ -1,5 +1,6 @@
 ﻿using System.Timers;
 using System.Data;
+using System.Collections.Generic;
 using System.Globalization;
 using System;
 using System.IO;
@@ -12,14 +13,18 @@ namespace DeepRename
     {
         static void Main(string[] args)
         {
+            Console.BackgroundColor = ConsoleColor.Black;
+            ICollection<ChangesInExcel> filesTouched = new List<ChangesInExcel>();
             var executeIn = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
             if (!System.IO.File.Exists(System.IO.Path.Combine(executeIn, "deeprename.zip")))
             {
                 executeIn = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\..\\..\\..\\";
                 if (!System.IO.File.Exists(System.IO.Path.Combine(executeIn, "deeprename.zip")))
                 {
+                    Console.ForegroundColor = ConsoleColor.Blue;
                     Console.WriteLine($"Please ensure your deeprename.zip is next to this .exe {System.IO.Path.Combine(executeIn, "deeprename.zip")}");
                     Console.WriteLine("I will exit early now so you can work on that, thank you, cheers, -robot");
+                    Console.ForegroundColor = ConsoleColor.White;
                     return;
                 }
             }
@@ -39,7 +44,11 @@ namespace DeepRename
             var toAllUpper = toKeyword.ToUpper();
 
             Console.WriteLine($"Starting process to replace {fromUpper} with {toUpper} and {fromLower} with {toLower} and {fromAllUpper} with {toAllUpper}.");
-
+            var zipResults = System.IO.Path.Combine(executeIn, "deeprename_renamed.zip");
+            if (System.IO.File.Exists(zipResults))
+            {
+                System.IO.File.Delete(zipResults);
+            }
             var executeInSub = Path.Combine(executeIn, "deeprename");
             if (System.IO.Directory.Exists(executeInSub))
             {
@@ -69,6 +78,12 @@ namespace DeepRename
             timer.Enabled = true;
             string[] searchFiles;
 
+
+            // lets carry some results output
+            if (System.IO.File.Exists(System.IO.Path.Combine(executeIn, "deeprename_report.xlsx")))
+            {
+                System.IO.File.Delete(System.IO.Path.Combine(executeIn, "deeprename_report.xlsx"));
+            }
             // pass one, clean up file contents
             timerPreText = "Reworking File Contents";
 
@@ -77,9 +92,24 @@ namespace DeepRename
             {
                 var directoryName = System.IO.Path.GetDirectoryName(file);
 
-                var scanContents = System.IO.File.ReadAllText(file);
+                var scanContents = "";
+                try
+                {
+                    scanContents = System.IO.File.ReadAllText(file);
+                }
+                catch (Exception)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"<Failed to> access file for read ! {System.IO.Path.GetFileName(file)}");
+                    Console.ForegroundColor = ConsoleColor.White;
+                }
                 if (scanContents.ToUpper().Contains(fromAllUpper))
                 {
+                    filesTouched.Add(new ChangesInExcel { 
+                        FileName = System.IO.Path.GetFileName(file),
+                        FileType = System.IO.Path.GetExtension(file),
+                        FolderName = System.IO.Path.GetDirectoryName(file)
+                    });
                     Console.WriteLine($"File contents rework ! {System.IO.Path.GetFileName(file)}");
                     try
                     {
@@ -90,7 +120,9 @@ namespace DeepRename
                     }
                     catch (Exception)
                     {
+                        Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine($"<Failed to> File contents rework ! {System.IO.Path.GetFileName(file)}");
+                        Console.ForegroundColor = ConsoleColor.White;
                     }
                 }
             }
@@ -114,7 +146,9 @@ namespace DeepRename
                     }
                     catch (Exception)
                     {
+                        Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine($"<Failed to> File move to ! {newFileName}");
+                        Console.ForegroundColor = ConsoleColor.White;
                     }
 
                 }
@@ -140,7 +174,9 @@ namespace DeepRename
                     }
                     catch (Exception)
                     {
+                        Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine($"<Failed to> Folder move to ! {newDirName}");
+                        Console.ForegroundColor = ConsoleColor.White;
                     }
                 }
             }
@@ -149,13 +185,7 @@ namespace DeepRename
             timerPreText = "Creating New Zip File ....";
 
             timer.Enabled = true;
-            var zipResults = System.IO.Path.Combine(executeIn, "deeprename_renamed.zip");
-
-            if (System.IO.File.Exists(zipResults))
-            {
-                System.IO.File.Delete(zipResults);
-            }
-
+            
             ZipFile.CreateFromDirectory(executeInSub, zipResults);
 
             timerPreText = "Cleaning up work area ....";
@@ -166,6 +196,18 @@ namespace DeepRename
             }
 
             timer.Enabled = false;
+            Console.WriteLine($"The following files saw content edits:");
+                        
+            OfficeOpenXml.ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;                
+            using (var langwishEx = new OfficeOpenXml.ExcelPackage(new FileInfo(System.IO.Path.Combine(executeIn, "deeprename_report.xlsx"))))
+            {
+                var filesWorksheet = langwishEx.Workbook.Worksheets.Add("Files");
+                var fileContentsWorksheet = langwishEx.Workbook.Worksheets.Add("FileContents");
+                var foldersWorksheet = langwishEx.Workbook.Worksheets.Add("Folders");
+                filesWorksheet.Cells["A1"].LoadFromCollection(filesTouched);
+                langwishEx.Save();                
+            }
+            
             Console.WriteLine($"The process has completed, press anykey to close");
             Console.ReadKey();
 
@@ -192,6 +234,12 @@ namespace DeepRename
                 Console.Write($"{timerPreText} {spinner[spinnerState]}");
                 Console.SetCursorPosition(0, Console.CursorTop);
             }
+        }
+
+        public class ChangesInExcel {
+            public string FileType {get;set;}
+            public string FileName {get;set;}
+            public string FolderName {get;set;}
         }
     }
 }
