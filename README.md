@@ -12,9 +12,10 @@
 
 - <a href="https://www.youtube.com/watch?v=BxEC-0aQ650" target="_blank">Quick Video Tour (3-min)</a>
 
+- Clean and prepare your work for renaming, ie. delete everything you can. npm packages, /bin & /obj folders etc.
 - Zip up what you wish to rename in a common .zip format
-- Place that next to this .exe with the name deeprename.zip
-- Run this .exe
+- Place that next to this .exe with the specific name of deeprename.zip
+- Run deeprename.exe
 - Final result will be deeprename_renamed.zip with all changes included
 
 Answer the 2 questions when prompted
