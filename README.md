@@ -4,8 +4,7 @@
 
 <h3>How to most easily get the latest executables</h3>
   
-  * <a href="https://github.com/10GeekJames/DeepRename/tree/main/Runnables/DeepRenameExecutable.
-  zip">DeepRenameExecutable.zip</a>
+  * <a href="https://github.com/10GeekJames/DeepRename/tree/main/Runnables/DeepRenameExecutable.zip">DeepRenameExecutable.zip</a>
 *<small>The first time you run the common "Windows protected your PC", don't run screen will appear, click "More Info" and you can select to run.</small>
 
 
