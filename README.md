@@ -1,5 +1,12 @@
+
 <h1> Safely and recursively rename folders, files, and file content</h1>
-<sub>A super quick, super tragic, might make it cooler one day, but gets the job done way to rename everything everywhere</sub>
+<sub>A super quick, gets the job done way to rename everything everywhere. Works against .zip files to keep your original files safe.</sub>
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/BxEC-0aQ650" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<a href="https://www.youtube.com/watch?v=BxEC-0aQ650" target="_blank">Quick Video Tour (3-min)</a>
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/ZH4EnRQ5nVI" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<a href="Lengthier Tour (9-min): https://www.youtube.com/watch?v=ZH4EnRQ5nVI" target="_blank">Lengthier Video Tour (9-min)</a>
 
 <h3>Getting Started</h3>
 
@@ -34,4 +41,18 @@ Becomes
 ```
 
 attempts reworks are case-senstive, but, expanded to the pattern respectively
+
+If you have <a href="https://winmerge.org/downloads/?lang=en" target="_blank"> Winmerge </a> installed at default locations a side by side comparisson of the deeprename_filecontentsonly.zip and the deeprename.zip will be pulled up for you. 
+
+deeprename_filecontentsonly.zip has file-level renames applied how ever, file names and folder names remain unchanged that common comparison tools might be used to see these changes at a granular level.
+
+```
+Input:
+ deeprename.zip
+
+Output:
+ deeprename_renamed.zip
+ deeprename_filecontentsonly.zip
+ deeprename_report.xlsx
+```
 
