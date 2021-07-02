@@ -4,7 +4,7 @@
 
 - <a href="https://www.youtube.com/watch?v=BxEC-0aQ650" target="_blank">Quick Video Tour (3-min)</a>
 
-- <a href="Lengthier Tour (9-min): https://www.youtube.com/watch?v=ZH4EnRQ5nVI" target="_blank">Lengthier Video Tour (9-min)</a>
+- <a href="https://www.youtube.com/watch?v=ZH4EnRQ5nVI" target="_blank">Lengthier Tour (9-min)</a>
 
 <h3>Getting Started</h3>
 
