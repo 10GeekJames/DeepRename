@@ -2,8 +2,9 @@
 <h1> Safely and recursively rename folders, files, and file content</h1>
 <sub>A super quick, gets the job done way to rename everything everywhere and sort of know what changes took place. Works against .zip files to keep your original files safe.</sub>
 
-<a href="https://www.youtube.com/watch?v=BxEC-0aQ650" target="_blank">Quick Video Tour (3-min)</a>
-<a href="Lengthier Tour (9-min): https://www.youtube.com/watch?v=ZH4EnRQ5nVI" target="_blank">Lengthier Video Tour (9-min)</a>
+- <a href="https://www.youtube.com/watch?v=BxEC-0aQ650" target="_blank">Quick Video Tour (3-min)</a>
+
+- <a href="Lengthier Tour (9-min): https://www.youtube.com/watch?v=ZH4EnRQ5nVI" target="_blank">Lengthier Video Tour (9-min)</a>
 
 <h3>Getting Started</h3>
 
