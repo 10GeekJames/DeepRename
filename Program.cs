@@ -6,6 +6,7 @@ using System;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Diagnostics;
 
 namespace DeepRename
 {
@@ -24,7 +25,8 @@ namespace DeepRename
                     Console.ForegroundColor = ConsoleColor.Blue;
                     Console.WriteLine($"Please ensure your deeprename.zip is next to this .exe {System.IO.Path.Combine(executeIn, "deeprename.zip")}");
                     Console.WriteLine("I will exit early now so you can work on that, thank you, cheers, -robot");
-                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.ForegroundColor = ConsoleColor.Gray;
+                    Console.ReadKey();
                     return;
                 }
             }
@@ -101,11 +103,12 @@ namespace DeepRename
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine($"<Failed to> access file for read ! {System.IO.Path.GetFileName(file)}");
-                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.ForegroundColor = ConsoleColor.Gray;
                 }
                 if (scanContents.ToUpper().Contains(fromAllUpper))
                 {
-                    filesTouched.Add(new ChangesInExcel { 
+                    filesTouched.Add(new ChangesInExcel
+                    {
                         FileName = System.IO.Path.GetFileName(file),
                         FileType = System.IO.Path.GetExtension(file),
                         FolderName = System.IO.Path.GetDirectoryName(file)
@@ -122,10 +125,18 @@ namespace DeepRename
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine($"<Failed to> File contents rework ! {System.IO.Path.GetFileName(file)}");
-                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.ForegroundColor = ConsoleColor.Gray;
                     }
                 }
             }
+
+            // take a quick snapshot of file changes only for winmerge or other compare
+            var zipResultsSnapshot = System.IO.Path.Combine(executeIn, "deeprename_filecontentsonly.zip");
+            if (System.IO.File.Exists(zipResultsSnapshot))
+            {
+                System.IO.File.Delete(zipResultsSnapshot);
+            }
+            ZipFile.CreateFromDirectory(executeInSub, zipResultsSnapshot);
 
             // pass two, clean up file names
             timerPreText = "Reworking File Names";
@@ -148,7 +159,7 @@ namespace DeepRename
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine($"<Failed to> File move to ! {newFileName}");
-                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.ForegroundColor = ConsoleColor.Gray;
                     }
 
                 }
@@ -176,7 +187,7 @@ namespace DeepRename
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine($"<Failed to> Folder move to ! {newDirName}");
-                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.ForegroundColor = ConsoleColor.Gray;
                     }
                 }
             }
@@ -185,7 +196,7 @@ namespace DeepRename
             timerPreText = "Creating New Zip File ....";
 
             timer.Enabled = true;
-            
+
             ZipFile.CreateFromDirectory(executeInSub, zipResults);
 
             timerPreText = "Cleaning up work area ....";
@@ -197,17 +208,29 @@ namespace DeepRename
 
             timer.Enabled = false;
             Console.WriteLine($"The following files saw content edits:");
-                        
-            OfficeOpenXml.ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;                
+
+            OfficeOpenXml.ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
             using (var langwishEx = new OfficeOpenXml.ExcelPackage(new FileInfo(System.IO.Path.Combine(executeIn, "deeprename_report.xlsx"))))
             {
                 var filesWorksheet = langwishEx.Workbook.Worksheets.Add("Files");
                 var fileContentsWorksheet = langwishEx.Workbook.Worksheets.Add("FileContents");
                 var foldersWorksheet = langwishEx.Workbook.Worksheets.Add("Folders");
                 filesWorksheet.Cells["A1"].LoadFromCollection(filesTouched);
-                langwishEx.Save();                
+                langwishEx.Save();
             }
-            
+
+            // if winmerge is installed, lets open the file content snapshot for comparisson
+            try
+            {
+                var fileName = @"C:\Program Files\WinMerge\WinMergeU.exe";
+                var arguments = $"{System.IO.Path.Combine(executeIn, "deeprename.zip")} {System.IO.Path.Combine(executeIn, "deeprename_filecontentsonly.zip")} /r";
+                Process.Start(fileName, arguments);
+            }
+            catch (Exception)
+            {
+
+            }
+
             Console.WriteLine($"The process has completed, press anykey to close");
             Console.ReadKey();
 
@@ -236,10 +259,11 @@ namespace DeepRename
             }
         }
 
-        public class ChangesInExcel {
-            public string FileType {get;set;}
-            public string FileName {get;set;}
-            public string FolderName {get;set;}
+        public class ChangesInExcel
+        {
+            public string FileType { get; set; }
+            public string FileName { get; set; }
+            public string FolderName { get; set; }
         }
     }
 }
